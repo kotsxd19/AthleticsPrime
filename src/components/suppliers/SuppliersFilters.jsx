@@ -10,7 +10,6 @@ export default function SuppliersFilters({ filter, setFilter, search, setSearch 
   return (
     <section className="bg-white rounded-2xl shadow-sm shadow-slate-200/60 border border-slate-100 p-4 sm:p-5">
       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-
         <div className="flex flex-wrap items-center gap-2">
           {chips.map(({ value, label, dot }) => (
             <button
@@ -23,9 +22,7 @@ export default function SuppliersFilters({ filter, setFilter, search, setSearch 
             </button>
           ))}
         </div>
-
         <div className="flex-1" />
-
         <div className="relative w-full lg:w-80">
           <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
           <input
@@ -35,7 +32,6 @@ export default function SuppliersFilters({ filter, setFilter, search, setSearch 
             className="input pl-9"
           />
         </div>
-
       </div>
     </section>
   );

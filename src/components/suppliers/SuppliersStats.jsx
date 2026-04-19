@@ -1,9 +1,9 @@
 // src/components/suppliers/SuppliersStats.jsx
 
 const statItems = [
-  { key: 'active',   label: 'Activos',   icon: 'fa-check',   bg: 'bg-emerald-50', color: 'text-emerald-600' },
-  { key: 'inactive', label: 'Inactivos', icon: 'fa-pause',   bg: 'bg-rose-50',    color: 'text-rose-500'    },
-  { key: 'total',    label: 'Total',     icon: 'fa-truck',   bg: 'bg-indigo-50',  color: 'text-indigo-500'  },
+  { key: 'active',   label: 'Activos',   icon: 'fa-check', bg: 'bg-emerald-50', color: 'text-emerald-600' },
+  { key: 'inactive', label: 'Inactivos', icon: 'fa-pause', bg: 'bg-rose-50',    color: 'text-rose-500'    },
+  { key: 'total',    label: 'Total',     icon: 'fa-truck', bg: 'bg-indigo-50',  color: 'text-indigo-500'  },
 ];
 
 export default function SuppliersStats({ stats }) {

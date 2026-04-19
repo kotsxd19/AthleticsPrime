@@ -1,104 +1,67 @@
-// src/components/suppliers/SupplierModal.jsx
-import { useState, useEffect } from 'react';
+// src/components/suppliers/SuppliersTable.jsx
 
-const empty = {
-  name: '', contact: '', phone: '', email: '',
-  location: '', active: true,
+const fmtDate = (d) => {
+  if (!d) return '—';
+  const [y, m, da] = d.split('-');
+  return `${da}/${m}/${y}`;
 };
 
-export default function SupplierModal({ supplier, onClose, onSave }) {
-  const [form, setForm] = useState(empty);
-
-  useEffect(() => {
-    setForm(supplier ? { ...supplier } : empty);
-  }, [supplier]);
-
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave({ ...form });
-  };
-
+export default function SuppliersTable({ suppliers, onToggle, onEdit, onDelete }) {
   return (
-    <div
-      className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4"
-      onClick={e => e.target === e.currentTarget && onClose()}
-    >
-      <div className="modal-panel bg-white w-full max-w-lg max-h-[92vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div>
-            <h3 className="text-lg font-bold tracking-tight">
-              {supplier ? 'Editar proveedor' : 'Nuevo proveedor'}
-            </h3>
-            <p className="text-xs text-slate-500">Completa los datos del proveedor</p>
-          </div>
-          <button onClick={onClose} className="icon-btn text-slate-500">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="modal-scroll overflow-y-auto p-6 space-y-5">
-
-          {/* Info general */}
-          <div className="form-section">
-            <h4><span className="icon-box"><i className="fa-solid fa-truck" /></span>Información general</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
-                <label className="input-label">Nombre del proveedor *</label>
-                <input required className="input" placeholder="Ej. Elite Sports Supply"
-                  value={form.name} onChange={e => set('name', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Nombre de contacto *</label>
-                <input required className="input" placeholder="Ej. Carlos Méndez"
-                  value={form.contact} onChange={e => set('contact', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Teléfono</label>
-                <input className="input" placeholder="+503 7123 4567"
-                  value={form.phone} onChange={e => set('phone', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Correo electrónico</label>
-                <input type="email" className="input" placeholder="correo@empresa.com"
-                  value={form.email} onChange={e => set('email', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Ubicación</label>
-                <input className="input" placeholder="Ej. San Salvador, El Salvador"
-                  value={form.location} onChange={e => set('location', e.target.value)} />
-              </div>
-            </div>
-          </div>
-
-          {/* Estado */}
-          <div className="form-section">
-            <h4><span className="icon-box"><i className="fa-solid fa-toggle-on" /></span>Estado</h4>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" className="w-5 h-5 accent-indigo-600 rounded"
-                checked={form.active} onChange={e => set('active', e.target.checked)} />
-              <span className="text-sm text-slate-600">Proveedor activo</span>
-            </label>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-            <button type="button" onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-sm">
-              Cancelar
-            </button>
-            <button type="submit"
-              className="px-5 py-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 hover:brightness-110 text-white font-semibold text-sm">
-              <i className="fa-solid fa-check mr-1" /> Guardar proveedor
-            </button>
-          </div>
-
-        </form>
+    <section className="bg-white rounded-2xl shadow-sm shadow-slate-200/60 border border-slate-100 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
+            <tr className="text-left">
+              {['Nombre','Nombre contacto','N. Teléfono','Correo','Ubicación','Estado','F. Creado','F. Act.','Acciones'].map(h => (
+                <th key={h} className={`px-5 py-3 font-semibold${h === 'Acciones' ? ' text-right' : ''}`}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {suppliers.map(s => (
+              <tr key={s.id} className="product-row">
+                <td className="px-5 py-4 font-semibold text-slate-900">{s.name}</td>
+                <td className="px-5 py-4 text-slate-600">{s.contact}</td>
+                <td className="px-5 py-4 text-slate-600">{s.phone || '—'}</td>
+                <td className="px-5 py-4 text-slate-500 max-w-[200px]">
+                  <div className="truncate" title={s.email}>{s.email || '—'}</div>
+                </td>
+                <td className="px-5 py-4 text-slate-600 max-w-[160px]">
+                  <div className="truncate" title={s.location}>{s.location || '—'}</div>
+                </td>
+                <td className="px-5 py-4">
+                  <span className={`status-badge ${s.active ? 'status-active' : 'status-inactive'}`}>
+                    <i className="fa-solid fa-circle text-[7px]" />
+                    {s.active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
+                <td className="px-5 py-4 text-slate-600">{fmtDate(s.createdAt)}</td>
+                <td className="px-5 py-4 text-slate-600">{fmtDate(s.updatedAt)}</td>
+                <td className="px-5 py-4">
+                  <div className="flex items-center justify-end gap-1">
+                    <button title={s.active ? 'Desactivar' : 'Activar'} onClick={() => onToggle(s.id)} className="icon-btn text-slate-600">
+                      <i className={`fa-solid fa-${s.active ? 'pause' : 'play'}`} />
+                    </button>
+                    <button title="Editar" onClick={() => onEdit(s)} className="icon-btn text-indigo-600 hover:bg-indigo-50">
+                      <i className="fa-solid fa-pen" />
+                    </button>
+                    <button title="Eliminar" onClick={() => onDelete(s.id)} className="icon-btn text-rose-600 hover:bg-rose-50">
+                      <i className="fa-solid fa-trash" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </div>
+      {suppliers.length === 0 && (
+        <div className="p-12 text-center text-slate-500">
+          <i className="fa-regular fa-folder-open text-3xl mb-3 text-slate-300 block" />
+          <p>No hay proveedores que coincidan.</p>
+        </div>
+      )}
+    </section>
   );
 }
