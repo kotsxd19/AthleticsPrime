@@ -5,12 +5,14 @@ import Dashboard  from './pages/Dashboard';
 import Offers     from './pages/Offers';
 import Products   from './pages/Products';
 import Login      from './pages/Login';
+import Suppliers  from './pages/supplier';
+import Clients   from './pages/Customers';
+import Orders    from './pages/Orders';
 
 /*
   Páginas futuras — descomenta cuando estén listas:
-  import Suppliers from './pages/Suppliers';
-  import Clients   from './pages/Clients';
-  import Orders    from './pages/Orders';
+
+  
 */
 
 export default function App() {
@@ -31,11 +33,12 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/offers"   element={<Offers />}    />
         <Route path="/products" element={<Products />}  />
+        <Route path="/suppliers" element={<Suppliers />} />
+        <Route path="/clients"   element={<Clients />}   /> 
+        <Route path="/orders"    element={<Orders />}    />
 
         {/* Futuras rutas */}
-        {/* <Route path="/suppliers" element={<Suppliers />} /> */}
-        {/* <Route path="/clients"   element={<Clients />}   /> */}
-        {/* <Route path="/orders"    element={<Orders />}    /> */}
+        {/*  */}
 
         {/* Ruta desconocida → login */}
         <Route path="*" element={<Navigate to="/login" replace />} />

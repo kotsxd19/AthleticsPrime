@@ -1,6 +1,8 @@
 // src/components/Navbar.jsx
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import logo from "../../assets/LogoLetras.png";
+import LogoLetras from "../../assets/LogoLetras.png"
 
 const navLinks = [
   { label: 'Inicio',      to: '/dashboard' },
@@ -22,9 +24,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white">
-              <i className="fa-solid fa-bolt" />
-            </div>
+            <img src={logo} alt="" className='w-45 h-16' />
             <span className="font-bold text-lg tracking-tight">Prime Athletics</span>
           </Link>
 
