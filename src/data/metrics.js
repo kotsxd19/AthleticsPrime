@@ -1,0 +1,50 @@
+export const metricsData = [
+  {
+    id: 1,
+    title: 'Ventas de la semana',
+    value: '$2,460',
+    change: '5.50% más que la semana pasada',
+    trend: 'up',
+    icon: 'fa-bag-shopping',
+    iconBg: 'bg-indigo-50',
+    iconColor: 'text-indigo-600',
+  },
+  {
+    id: 2,
+    title: 'Ingresos de la semana',
+    value: '$246,539',
+    change: '1.69% menos que la semana pasada',
+    trend: 'down',
+    icon: 'fa-dollar-sign',
+    iconBg: 'bg-emerald-50',
+    iconColor: 'text-emerald-600',
+  },
+  {
+    id: 3,
+    title: 'Egresos de la semana',
+    value: '$10,556',
+    change: '5.50% menos que la semana pasada',
+    trend: 'down',
+    icon: 'fa-receipt',
+    iconBg: 'bg-rose-50',
+    iconColor: 'text-rose-600',
+    positiveIsDown: true,
+  },
+  {
+    id: 4,
+    title: 'Inventario',
+    value: '20,574',
+    change: 'Unidades disponibles en stock',
+    trend: 'neutral',
+    icon: 'fa-boxes-stacked',
+    iconBg: 'bg-amber-50',
+    iconColor: 'text-amber-600',
+  },
+];
+
+export const chartTitles = [
+  'Ventas mensuales',
+  'Ingresos por categoría',
+  'Usuarios activos',
+  'Pedidos pendientes',
+];
