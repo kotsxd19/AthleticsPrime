@@ -28,8 +28,8 @@ export default function SuppliersFilters({ filter, setFilter, search, setSearch 
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar proveedor, contacto o ubicación…"
-            className="input pl-9"
+            placeholder="Buscar proveedor o ubicación…"
+           className="input !pl-9"
           />
         </div>
       </div>

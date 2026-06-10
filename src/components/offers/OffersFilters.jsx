@@ -34,7 +34,7 @@ export default function OffersFilters({ filter, setFilter, search, setSearch }) 
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar oferta, código o descripción…"
-            className="input pl-9"
+            className="input !pl-9"
           />
         </div>
 
