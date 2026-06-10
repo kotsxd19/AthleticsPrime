@@ -23,13 +23,13 @@ export default function ClientsFilters({ filter, setFilter, search, setSearch })
           ))}
         </div>
         <div className="flex-1" />
-        <div className="relative w-full lg:w-80">
-          <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+        <div className="flex items-center gap-2 w-full lg:w-80 border border-slate-200 rounded-xl bg-slate-50 px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-300 focus-within:border-indigo-400 transition-all">
+          <i className="fa-solid fa-magnifying-glass text-slate-400 text-sm flex-shrink-0" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar cliente, correo o dirección…"
-            className="input pl-9"
+            className="bg-transparent outline-none text-sm text-slate-700 placeholder:text-slate-400 w-full"
           />
         </div>
       </div>

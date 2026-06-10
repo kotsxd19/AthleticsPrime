@@ -1,88 +1,163 @@
-// src/components/clients/ClientModal.jsx
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const empty = { name: '', email: '', password: '', phone: '', address: '', verified: false, active: true };
+const CustomerForm = ({
 
-export default function ClientModal({ client, onClose, onSave }) {
-  const [form, setForm] = useState(empty);
+    id,
+    email,
+    setEmail,
+    name,
+    setName,
+    password,
+    setPassword,
+    status,
+    setStatus,
+    phone_number,
+    setPhoneNumber,
+    registered_at,
+    setRegisteredAt,
+    is_verified,
+    setIsVerified,
+    address,
+    setAddress,
+    onSubmit,
+    onCancel,
+    submitting,
+    onClose,
+    error,
+    message,
+}) => {
+  return(
 
-  useEffect(() => { setForm(client ? { ...client } : empty); }, [client]);
-
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  return (
-    <div
-      className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4"
+     <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div className="modal-panel bg-white w-full max-w-lg max-h-[92vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92vh]">
+ 
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div>
-            <h3 className="text-lg font-bold tracking-tight">{client ? 'Editar cliente' : 'Nuevo cliente'}</h3>
-            <p className="text-xs text-slate-500">Completa los datos del cliente</p>
+            <h3 className="text-lg font-bold tracking-tight text-gray-900">
+              {client ? 'Editar cliente' : 'Nuevo cliente'}
+            </h3>
+            <p className="text-xs text-gray-500">Completa los datos del cliente</p>
           </div>
-          <button onClick={onClose} className="icon-btn text-slate-500"><i className="fa-solid fa-xmark" /></button>
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <i className="fa-solid fa-xmark text-xl" />
+          </button>
         </div>
-
-        <form onSubmit={e => { e.preventDefault(); onSave({ ...form }); }} className="modal-scroll overflow-y-auto p-6 space-y-5">
-
-          <div className="form-section">
-            <h4><span className="icon-box"><i className="fa-solid fa-user" /></span>Información personal</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
-                <label className="input-label">Nombre completo *</label>
-                <input required className="input" placeholder="Ej. Luis Martínez"
-                  value={form.name} onChange={e => set('name', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Correo electrónico *</label>
-                <input required type="email" className="input" placeholder="correo@gmail.com"
-                  value={form.email} onChange={e => set('email', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Contraseña *</label>
-                <input required className="input" placeholder="Ej. Pass#2026"
-                  value={form.password} onChange={e => set('password', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Teléfono</label>
-                <input className="input" placeholder="+503 7123 4567"
-                  value={form.phone} onChange={e => set('phone', e.target.value)} />
-              </div>
-              <div>
-                <label className="input-label">Dirección</label>
-                <input className="input" placeholder="San Salvador, El Salvador"
-                  value={form.address} onChange={e => set('address', e.target.value)} />
-              </div>
+ 
+        {/* Body */}
+        <div className="p-6 overflow-y-auto">
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
             </div>
-          </div>
-
-          <div className="form-section">
-            <h4><span className="icon-box"><i className="fa-solid fa-toggle-on" /></span>Estado</h4>
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" className="w-5 h-5 accent-indigo-600"
-                  checked={form.active} onChange={e => set('active', e.target.checked)} />
-                <span className="text-sm text-slate-600">Cliente activo</span>
+          )}
+ 
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Nombre</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={e => set('name', e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="Ingresa el nombre"
+                required
+              />
+            </div>
+ 
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Correo electrónico</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={e => set('email', e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="Ingresa el correo electrónico"
+                required
+              />
+            </div>
+ 
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              <input
+                type="text"
+                value={form.password}
+                onChange={e => set('password', e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="Ingresa la contraseña"
+                required
+              />
+            </div>
+ 
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+              <input
+                type="text"
+                value={form.phone_number}
+                onChange={e => set('phone_number', e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="Ingresa el teléfono"
+              />
+            </div>
+ 
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Dirección</label>
+              <input
+                type="text"
+                value={form.address}
+                onChange={e => set('address', e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="Ingresa la dirección"
+              />
+            </div>
+ 
+            <div className="flex gap-6 py-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  checked={!!form.status}
+                  onChange={e => set('status', e.target.checked)}
+                />
+                <span className="text-sm font-medium text-gray-700">Cliente activo</span>
               </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" className="w-5 h-5 accent-emerald-600"
-                  checked={form.verified} onChange={e => set('verified', e.target.checked)} />
-                <span className="text-sm text-slate-600">Cliente verificado</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  checked={!!form.is_verified}
+                  onChange={e => set('is_verified', e.target.checked)}
+                />
+                <span className="text-sm font-medium text-gray-700">Cliente verificado</span>
               </label>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-sm">Cancelar</button>
-            <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 hover:brightness-110 text-white font-semibold text-sm">
-              <i className="fa-solid fa-check mr-1" /> Guardar cliente
-            </button>
-          </div>
-
-        </form>
+ 
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+              >
+                {submitting ? 'Guardando...' : client ? 'Actualizar cliente' : 'Guardar cliente'}
+              </button>
+            </div>
+          </form>
+        </div>
+ 
       </div>
     </div>
   );
 }
+
+export default CustomerForm;

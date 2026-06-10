@@ -1,22 +1,23 @@
 // src/pages/Clients.jsx
-import { useClients } from '../hooks/customers';
+import useCustomer from '../hooks/useCustomer';
 import PageHeader from '../components/shared/PageHeader';
 import Toast from '../components/shared/Toast';
 import ClientsStats from '../components/customers/CustomersStats';
 import ClientsFilters from '../components/customers/CustomersFilters';
 import ClientsTable from '../components/customers/CustomersTable';
-import ClientModal from '../components/customers/CustomersModal';
+{/*import ClientModal from '../components/customers/CustomersModal'; */}
 
 export default function Clients() {
   const {
     filtered, stats,
     filter, setFilter,
     search, setSearch,
+    loading, error,
     modalOpen, editingClient,
     toast, openCreate, openEdit,
     closeModal, saveClient,
     toggleClient, toggleVerified, deleteClient,
-  } = useClients();
+  } = useCustomer();
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -36,11 +37,21 @@ export default function Clients() {
 
       <ClientsTable
         clients={filtered}
+        loading={loading}
+        error={error}
         onToggle={toggleClient}
         onToggleVerified={toggleVerified}
         onEdit={openEdit}
         onDelete={deleteClient}
       />
+
+      {/*{modalOpen && (
+        <ClientModal
+          client={editingClient}
+          onClose={closeModal}
+          onSave={saveClient}
+        />
+      )}*/}
 
       <button
         onClick={openCreate}
@@ -50,14 +61,7 @@ export default function Clients() {
         <i className="fa-solid fa-plus" />
       </button>
 
-      {modalOpen && (
-        <ClientModal
-          client={editingClient}
-          onClose={closeModal}
-          onSave={saveClient}
-        />
-      )}
-
+      
       <Toast message={toast} />
 
     </main>

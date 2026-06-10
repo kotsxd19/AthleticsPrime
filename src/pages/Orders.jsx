@@ -1,5 +1,5 @@
 // src/pages/Orders.jsx
-import { useOrders } from '../hooks/orders';
+import useOrders from '../hooks/useOrders';
 import PageHeader from '../components/shared/PageHeader';
 import Toast from '../components/shared/Toast';
 import OrdersStats from '../components/orders/OrdersStats';

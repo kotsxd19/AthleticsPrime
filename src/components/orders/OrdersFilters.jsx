@@ -1,9 +1,9 @@
 // src/components/orders/OrdersFilters.jsx
 
 const chips = [
-  { value: 'all',          label: 'Todos',      dot: null               },
-  { value: 'delivered',    label: 'Entregados', dot: 'text-emerald-500' },
-  { value: 'undelivered',  label: 'Pendientes', dot: 'text-amber-400'   },
+  { value: 'all',       label: 'Todos',      dot: null               },
+  { value: 'delivered', label: 'Entregados', dot: 'text-emerald-500' },
+  { value: 'pending',   label: 'Pendientes', dot: 'text-amber-400'   },
 ];
 
 export default function OrdersFilters({ filter, setFilter, search, setSearch }) {
@@ -17,7 +17,7 @@ export default function OrdersFilters({ filter, setFilter, search, setSearch }) 
               onClick={() => setFilter(value)}
               className={`chip px-4 py-2 rounded-xl text-sm font-medium text-slate-600 ${filter === value ? 'active' : ''}`}
             >
-              {dot && <i className={`fa-solid fa-circle text-[7px] mr-1.5 ${dot}`} />}
+              {dot && <span className={`inline-block w-2 h-2 rounded-full mr-1.5 ${dot.replace('text-', 'bg-')}`} />}
               {label}
             </button>
           ))}

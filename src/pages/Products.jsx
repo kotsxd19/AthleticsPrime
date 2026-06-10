@@ -1,5 +1,5 @@
 // src/pages/Products.jsx
-import { useProducts }    from '../hooks/useProducts';
+import useProducts from '../hooks/userProducts';
 import PageHeader         from '../components/shared/PageHeader';
 import Toast              from '../components/shared/Toast';
 import ProductsFilters    from '../components/products/ProductsFilters';
@@ -7,13 +7,7 @@ import ProductsTable      from '../components/products/ProductsTable';
 import ProductModal       from '../components/products/ProductModal';
 
 export default function Products() {
-  const {
-    filtered,
-    filter, setFilter,
-    search, setSearch,
-    modalOpen, setModalOpen,
-    toast, addProduct,
-  } = useProducts();
+ const { filtered, filter, setFilter, search, setSearch, modalOpen, openCreate, closeModal, saveProduct, toast } = useProducts();
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -33,7 +27,7 @@ export default function Products() {
 
       {/* FAB */}
       <button
-        onClick={() => setModalOpen(true)}
+        onClick={openCreate}
         className="fab fixed bottom-8 right-8 bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-2xl z-30"
         aria-label="Agregar producto"
       >
@@ -42,8 +36,8 @@ export default function Products() {
 
       {modalOpen && (
         <ProductModal
-          onClose={() => setModalOpen(false)}
-          onSave={addProduct}
+          onClose={closeModal} 
+          onSave={saveProduct}
         />
       )}
 

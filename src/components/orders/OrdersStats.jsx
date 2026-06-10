@@ -3,7 +3,7 @@
 export default function OrdersStats({ stats }) {
   const items = [
     { label: 'Entregados',    value: stats.delivered,              icon: 'fa-check',        bg: 'bg-emerald-50', color: 'text-emerald-600' },
-    { label: 'Pendientes',    value: stats.undelivered,            icon: 'fa-clock',        bg: 'bg-amber-50',   color: 'text-amber-500'   },
+    { label: 'Pendientes', value: stats.pending,          icon: 'fa-clock',        bg: 'bg-amber-50',   color: 'text-amber-500'   },
     { label: 'Total pedidos', value: stats.total,                  icon: 'fa-box',          bg: 'bg-indigo-50',  color: 'text-indigo-500'  },
     { label: 'Ingresos',      value: `$${stats.revenue.toLocaleString()}`, icon: 'fa-dollar-sign', bg: 'bg-violet-50',  color: 'text-violet-500'  },
   ];
