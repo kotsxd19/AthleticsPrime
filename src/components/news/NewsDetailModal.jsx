@@ -58,7 +58,7 @@ export default function NewsDetailModal({ news, onClose }) {
         <div className="overflow-y-auto p-6 space-y-6">
           {/* Big Banner Image */}
           {news.bannerImage && (
-            <div className="aspect-[2.2/1] rounded-2xl border border-slate-150 bg-slate-50 overflow-hidden relative shadow-sm">
+            <div className="aspect-[3/1] max-h-[160px] md:max-h-[200px] w-full rounded-2xl border border-slate-150 bg-slate-50 overflow-hidden relative shadow-sm flex items-center justify-center">
               <img
                 src={news.bannerImage}
                 alt="Banner"
@@ -74,7 +74,7 @@ export default function NewsDetailModal({ news, onClose }) {
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Tarjeta de Portada
               </h4>
-              <div className="aspect-square rounded-2xl border border-slate-200/80 bg-slate-50 overflow-hidden shadow-inner flex items-center justify-center">
+              <div className="aspect-square max-w-[140px] mx-auto md:mx-0 rounded-2xl border border-slate-200/80 bg-slate-50 overflow-hidden shadow-inner flex items-center justify-center">
                 {news.cardImage ? (
                   <img
                     src={news.cardImage}
