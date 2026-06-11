@@ -58,11 +58,14 @@ export default function NewsDetailModal({ news, onClose }) {
         <div className="overflow-y-auto p-6 space-y-6">
           {/* Big Banner Image */}
           {news.bannerImage && (
-            <div className="aspect-[3/1] max-h-[160px] md:max-h-[200px] w-full rounded-2xl border border-slate-150 bg-slate-50 overflow-hidden relative shadow-sm flex items-center justify-center">
+            <div 
+              style={{ height: "220px", width: "100%" }}
+              className="rounded-2xl border border-slate-150 bg-slate-50 overflow-hidden relative shadow-sm flex items-center justify-center"
+            >
               <img
                 src={news.bannerImage}
                 alt="Banner"
-                className="w-full h-full object-cover"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             </div>
           )}
@@ -74,12 +77,15 @@ export default function NewsDetailModal({ news, onClose }) {
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Tarjeta de Portada
               </h4>
-              <div className="aspect-square max-w-[140px] mx-auto md:mx-0 rounded-2xl border border-slate-200/80 bg-slate-50 overflow-hidden shadow-inner flex items-center justify-center">
+              <div 
+                style={{ maxWidth: "140px", aspectRatio: "1" }}
+                className="mx-auto md:mx-0 rounded-2xl border border-slate-200/80 bg-slate-50 overflow-hidden shadow-inner flex items-center justify-center"
+              >
                 {news.cardImage ? (
                   <img
                     src={news.cardImage}
                     alt="Card Cover"
-                    className="w-full h-full object-cover"
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
                   />
                 ) : (
                   <i className="fa-regular fa-image text-slate-300 text-3xl" />
