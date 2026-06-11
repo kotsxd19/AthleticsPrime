@@ -17,18 +17,20 @@ export default function Offers() {
     search, setSearch,
     loading, error,
     modalOpen, editingOffer,
+    detailModalOpen, viewingOffer,
     toast,
     openCreate, openEdit,
     closeModal, saveOffer,
+    closeDetailModal,
     toggleOffer, deleteOffer,
+    openDetail,
   } = useOffers();
 
   // Productos reales para el buscador del modal
   const { filtered: allProducts } = useProducts();
   const availableProducts = allProducts.map(p => ({ id: p.id ?? p._id, name: p.name }));
 
-  const [selectedOffer, setSelectedOffer] = useState(null);
-  const [deleteTarget,  setDeleteTarget]  = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   // Normaliza editingOffer al formato que espera OfferModal
   const modalInitialData = editingOffer ? {
@@ -106,7 +108,7 @@ export default function Offers() {
           onToggle={toggleOffer}
           onEdit={openEdit}
           onDelete={(id) => setDeleteTarget(filtered.find(o => o.id === id))}
-          onDetail={(o) => setSelectedOffer(o)}
+          onDetail={openDetail}
         />
       )}
 
@@ -128,10 +130,10 @@ export default function Offers() {
         />
       )}
 
-      {selectedOffer && (
+      {detailModalOpen && viewingOffer && (
         <OfferDetailModal
-          offer={selectedOffer}
-          onClose={() => setSelectedOffer(null)}
+          offer={viewingOffer}
+          onClose={closeDetailModal}
         />
       )}
 

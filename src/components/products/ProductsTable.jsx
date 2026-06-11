@@ -32,7 +32,7 @@ const genderStyle = (gender) => {
   return "bg-slate-50 text-slate-600 border border-slate-100";
 };
 
-const HEADERS = ["Nombre", "Marca", "Género", "Categoría", "Tipo", "Tallas", "Precio", "Stock disponible", "Acciones"];
+const HEADERS = ["Imagen", "Nombre", "Marca", "Género", "Categoría", "Tipo", "Tallas", "Precio", "Stock disponible", "Acciones"];
 
 export default function ProductsTable({ products, onDetail, onEdit, onDelete }) {
   const rows = products || [];
@@ -74,6 +74,16 @@ export default function ProductsTable({ products, onDetail, onEdit, onDelete }) 
 
             {rows.map((p) => (
               <tr key={p.id} className="product-row hover:bg-slate-50/50 transition-colors">
+                {/* Imagen */}
+                <td className="px-3 py-4">
+                  <div className="w-12 h-12 rounded-xl border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center shrink-0">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <i className="fa-regular fa-image text-slate-300 text-lg" />
+                    )}
+                  </div>
+                </td>
                 {/* Nombre */}
                 <td className="px-5 py-4 font-semibold text-slate-900 max-w-[200px] break-words">{p.name}</td>
                 {/* Marca */}

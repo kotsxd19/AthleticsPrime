@@ -18,6 +18,7 @@ const useOffers = () => {
   const [viewingOffer, setViewingOffer]       = useState(null);
 
   const [toast, setToast]               = useState("");
+  const [submitting, setSubmitting]     = useState(false);
 
   /* ── Fetch ── */
   const fetchOffers = async () => {
@@ -54,36 +55,99 @@ const useOffers = () => {
   /* ── Save ── */
   const saveOffer = async (formData) => {
     try {
+      setSubmitting(true);
       const id = formData.id;
       const isEditing = !!id;
 
-      const payload = {
-        name:                formData.name        || formData.title       || "",
-        description:         formData.description || formData.desc        || "",
+      const normalizedProducts = (formData.applicable_products || formData.products || [])
+        .map((p) => (typeof p === "object" ? (p.id ?? p._id) : p))
+        .filter(Boolean);
+
+      const basePayload = {
+        name: formData.name || formData.title || "",
+        description: formData.description || formData.desc || "",
         discount_percentage: Number(formData.discount_percentage ?? formData.disc ?? 0),
-        start_date:          formData.start_date  || formData.start       || formData.startDate || "",
-        end_date:            formData.end_date    || formData.end         || formData.endDate   || "",
-        active:              formData.active ?? true,
-        applicable_products: (formData.applicable_products || formData.products || []).map(p =>
-          typeof p === 'object' ? (p.id ?? p._id) : p
-        ),
-        ...(formData.bannerUrl ? { banner: { url: formData.bannerUrl } } : {}),
+        start_date: formData.start_date || formData.start || formData.startDate || "",
+        end_date: formData.end_date || formData.end || formData.endDate || "",
+        active: formData.active ?? true,
+        applicable_products: normalizedProducts,
       };
 
-      const res = await fetch(
-        isEditing ? `${API_URL}/${id}` : API_URL,
-        {
-          method:  isEditing ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify(payload),
+      const hasBannerFile = Boolean(formData.bannerFile);
+
+      let res;
+      let resJSON = {};
+
+      if (isEditing && hasBannerFile) {
+        const bannerData = new FormData();
+        bannerData.append("banner", formData.bannerFile);
+
+        const bannerRes = await fetch(`${API_URL}/${id}/banner`, {
+          method: "PUT",
+          body: bannerData,
+        });
+
+        const bannerJSON = await bannerRes.json().catch(() => ({}));
+        if (!bannerRes.ok) {
+          throw new Error(bannerJSON.message || "No se pudo actualizar la imagen del banner");
         }
-      );
-      if (!res.ok) throw new Error("No se pudo guardar la oferta");
+
+        res = await fetch(`${API_URL}/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(basePayload),
+        });
+      } else if (hasBannerFile) {
+        const uploadData = new FormData();
+        uploadData.append("name", basePayload.name);
+        uploadData.append("description", basePayload.description);
+        uploadData.append("discount_percentage", String(basePayload.discount_percentage));
+        uploadData.append("start_date", basePayload.start_date);
+        uploadData.append("end_date", basePayload.end_date);
+        uploadData.append("active", String(basePayload.active));
+
+        normalizedProducts.forEach((productId) => {
+          uploadData.append("applicable_products", String(productId));
+        });
+
+        uploadData.append("banner", formData.bannerFile);
+
+        res = await fetch(API_URL, {
+          method: "POST",
+          body: uploadData,
+        });
+      } else {
+        res = await fetch(
+          isEditing ? `${API_URL}/${id}` : API_URL,
+          {
+            method: isEditing ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...basePayload,
+              banner: formData.banner ?? (formData.bannerUrl ? { url: formData.bannerUrl } : undefined),
+            }),
+          }
+        );
+      }
+
+      try {
+        resJSON = await res.json();
+      } catch {
+        resJSON = {};
+      }
+
+      if (!res.ok) {
+        throw new Error(resJSON.message || (isEditing ? "No se pudo actualizar la oferta" : "No se pudo crear la oferta"));
+      }
+
       showToast(isEditing ? "Oferta actualizada" : "Oferta creada");
       closeModal();
       await fetchOffers();
     } catch (e) {
+      console.error("Error saving offer:", e);
       setError(e.message || "Error al guardar");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -91,29 +155,51 @@ const useOffers = () => {
   const toggleOffer = async (offerId) => {
     const offer = dataRaw.find(o => (o._id ?? o.id) === offerId);
     if (!offer) return;
+
+    const nextActive = !offer.active;
+
+    setDataRaw((prev) =>
+      prev.map((item) =>
+        (item._id ?? item.id) === offerId
+          ? { ...item, active: nextActive }
+          : item
+      )
+    );
+
+    showToast(nextActive ? "Oferta activada" : "Oferta desactivada");
+
     try {
-      const productsIds = (offer.applicable_products || []).map(p => 
-        typeof p === 'object' ? (p._id || p.id) : p
+      const productsIds = (offer.applicable_products || []).map((p) =>
+        typeof p === "object" ? (p._id || p.id) : p
       );
 
+      const payload = {
+        name: offer.name || offer.title || "",
+        description: offer.description || offer.desc || "",
+        discount_percentage: Number(offer.discount_percentage ?? offer.disc ?? 0),
+        start_date: offer.start_date || offer.start || "",
+        end_date: offer.end_date || offer.end || "",
+        active: nextActive,
+        applicable_products: productsIds,
+        banner: offer.banner || (offer.bannerUrl ? { url: offer.bannerUrl } : undefined),
+      };
+
       const res = await fetch(`${API_URL}/${offerId}`, {
-        method:  "PUT",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name:                offer.name,
-          description:         offer.description,
-          discount_percentage: offer.discount_percentage,
-          start_date:          offer.start_date,
-          end_date:            offer.end_date,
-          active:              !offer.active,
-          applicable_products: productsIds,
-        }),
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("No se pudo cambiar el estado");
-      showToast(!offer.active ? "Oferta activada" : "Oferta desactivada");
+
+      const resJSON = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showToast(nextActive ? "Oferta activada en la vista" : "Oferta desactivada en la vista");
+        return;
+      }
+
       await fetchOffers();
     } catch (e) {
-      setError(e.message || "Error al cambiar estado");
+      console.error("Error toggling offer:", e);
+      showToast("El cambio de estado quedó aplicado en la vista");
     }
   };
 
@@ -174,7 +260,7 @@ const useOffers = () => {
     filtered, stats,
     filter,  setFilter,
     search,  setSearch,
-    loading, error,
+    loading, error, submitting,
     modalOpen, editingOffer,
     // NUEVAS VARIABLES EXPORTADAS:
     detailModalOpen, viewingOffer,

@@ -44,6 +44,17 @@ const SPORT_OPTIONS = [
 const CLOTHING_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const SHOE_SIZES = ["37", "38", "39", "40", "41", "42", "43", "44"];
 
+const normalizeVariant = (variant) => ({
+  color: variant?.color || "negro",
+  images: Array.isArray(variant?.images) ? variant.images : [],
+  sizes: Array.isArray(variant?.sizes) ? variant.sizes : [],
+  tempFiles: [],
+  previewEntries: Array.isArray(variant?.images)
+    ? variant.images.map((img) => ({ url: img?.url || "", file: null, existing: true }))
+    : [],
+  ...variant,
+});
+
 export default function ProductModal({ product, onClose, onSave }) {
   const isEditing = !!product;
 
@@ -63,9 +74,7 @@ export default function ProductModal({ product, onClose, onSave }) {
   });
 
   const [variants, setVariants] = useState(
-    product?.variants || [
-      { color: "negro", images: [{ url: "", public_id: "none" }], sizes: [] }
-    ]
+    (product?.variants || [{ color: "negro", images: [], sizes: [] }]).map(normalizeVariant)
   );
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -84,7 +93,7 @@ export default function ProductModal({ product, onClose, onSave }) {
   const addVariant = () => {
     setVariants([
       ...variants,
-      { color: "nuevo", images: [{ url: "", public_id: "none" }], sizes: [] }
+      normalizeVariant({ color: "nuevo", images: [], sizes: [] }),
     ]);
   };
 
@@ -101,11 +110,24 @@ export default function ProductModal({ product, onClose, onSave }) {
     setVariants(updated);
   };
 
-  // Update variant image url
-  const updateVariantImageUrl = (idx, url) => {
+  const handleVariantImageUpload = (idx, event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+
     const updated = [...variants];
-    updated[idx].images = [{ url, public_id: "none" }];
+    const current = updated[idx] || {};
+
+    updated[idx] = {
+      ...current,
+      tempFiles: [...(current.tempFiles || []), ...files],
+      previewEntries: [
+        ...(current.previewEntries || []),
+        ...files.map((file) => ({ url: URL.createObjectURL(file), file, existing: false })),
+      ],
+    };
+
     setVariants(updated);
+    event.target.value = "";
   };
 
   // Get size stock value
@@ -376,43 +398,34 @@ export default function ProductModal({ product, onClose, onSave }) {
                       />
                     </div>
                     <div>
-                      <label className="input-label">Imagen de la variante</label>
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-xl border border-slate-200 bg-white overflow-hidden flex items-center justify-center relative flex-shrink-0">
-                          {v.previewUrl || v.images?.[0]?.url ? (
-                            <img
-                              src={v.previewUrl || v.images?.[0]?.url}
-                              alt="Preview"
-                              className="w-full h-full object-cover"
-                            />
+                      <label className="input-label">Imágenes de la variante</label>
+                      <div className="flex items-start gap-3">
+                        <div className="flex flex-wrap gap-2 w-24 shrink-0">
+                          {(v.previewEntries || []).length > 0 ? (
+                            (v.previewEntries || []).map((entry, imgIdx) => (
+                              <div key={`${vIdx}-${imgIdx}`} className="w-10 h-10 rounded-lg border border-slate-200 bg-white overflow-hidden flex items-center justify-center">
+                                <img src={entry.url} alt="Preview" className="w-full h-full object-cover" />
+                              </div>
+                            ))
                           ) : (
-                            <i className="fa-regular fa-image text-slate-400 text-xl" />
+                            <div className="w-10 h-10 rounded-lg border border-dashed border-slate-200 bg-white flex items-center justify-center text-slate-300">
+                              <i className="fa-regular fa-image text-base" />
+                            </div>
                           )}
                         </div>
                         <div className="flex-1">
                           <label className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl cursor-pointer inline-flex items-center gap-1.5 transition">
                             <i className="fa-solid fa-cloud-arrow-up text-slate-400" />
-                            Seleccionar imagen
+                            Agregar imágenes
                             <input
                               type="file"
                               accept="image/*"
+                              multiple
                               className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const preview = URL.createObjectURL(file);
-                                  const updated = [...variants];
-                                  updated[vIdx] = {
-                                    ...updated[vIdx],
-                                    tempFile: file,
-                                    previewUrl: preview,
-                                  };
-                                  setVariants(updated);
-                                }
-                              }}
+                              onChange={(e) => handleVariantImageUpload(vIdx, e)}
                             />
                           </label>
-                          <p className="text-[10px] text-slate-400 mt-1">PNG, JPG, WEBP de hasta 5MB</p>
+                          <p className="text-[10px] text-slate-400 mt-1">Puedes seleccionar varias imágenes por variante.</p>
                         </div>
                       </div>
                     </div>

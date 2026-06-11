@@ -73,27 +73,42 @@ export function useProducts() {
       const updatedVariants = [...(formData.variants || [])];
       for (let i = 0; i < updatedVariants.length; i++) {
         const variant = updatedVariants[i];
-        if (variant.tempFile) {
-          const uploadData = new FormData();
-          uploadData.append("image", variant.tempFile);
+        const filesToUpload = Array.isArray(variant.tempFiles)
+          ? variant.tempFiles
+          : variant.tempFile
+            ? [variant.tempFile]
+            : [];
 
-          const uploadRes = await fetch("http://localhost:4000/api/products/upload-image", {
-            method: "POST",
-            body: uploadData,
-          });
+        if (filesToUpload.length > 0) {
+          const uploadedImages = [];
 
-          if (!uploadRes.ok) {
-            throw new Error(`Error al subir la imagen para la variante de color: ${variant.color}`);
-          }
+          for (const file of filesToUpload) {
+            const uploadData = new FormData();
+            uploadData.append("image", file);
 
-          const uploadResult = await uploadRes.json();
-          variant.images = [
-            {
+            const uploadRes = await fetch("http://localhost:4000/api/products/upload-image", {
+              method: "POST",
+              body: uploadData,
+            });
+
+            if (!uploadRes.ok) {
+              throw new Error(`Error al subir una imagen para la variante de color: ${variant.color}`);
+            }
+
+            const uploadResult = await uploadRes.json();
+            uploadedImages.push({
               url: uploadResult.url,
               public_id: uploadResult.public_id,
-            },
+            });
+          }
+
+          variant.images = [
+            ...(Array.isArray(variant.images) ? variant.images : []),
+            ...uploadedImages,
           ];
 
+          delete variant.tempFiles;
+          delete variant.previewEntries;
           delete variant.tempFile;
           delete variant.previewUrl;
         }
@@ -192,10 +207,16 @@ export function useProducts() {
 
         // Size listing (joins first sizes for visual hint)
         const sizePreview = p.variants?.[0]?.sizes?.map(s => s.size).slice(0, 3).join(", ") || "—";
+        const imageUrl =
+          p.variants
+            ?.flatMap((variant) => (Array.isArray(variant.images) ? variant.images : []))
+            .find((img) => img?.url)?.url ||
+          "";
 
         return {
           ...p,
           id: p._id ?? p.id,
+          imageUrl,
           gender: mappedGender,
           cat: mappedCategory,
           type: capitalize(p.product_type),
