@@ -1,15 +1,16 @@
 import { useEffect, useState, useMemo } from "react";
 
-const API_URL = "http://localhost:4000/api/products";
+const API_URL = "http://localhost:4000/api/orders";
 
-const useProducts = () => {
+const useOrders = () => {
   const [dataTest, setDataTest] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [detailOrder, setDetailOrder] = useState(null);
   const [toast, setToast] = useState("");
 
   const fetchDataTest = async () => {
@@ -34,11 +35,13 @@ const useProducts = () => {
     setTimeout(() => setToast(""), 3000);
   };
 
-  const openCreate = () => { setEditingProduct(null); setModalOpen(true); };
-  const openEdit   = (p)  => { setEditingProduct(p);    setModalOpen(true); };
-  const closeModal = ()   => { setModalOpen(false); setEditingProduct(null); };
+  const openCreate  = ()  => { setEditingOrder(null); setModalOpen(true); };
+  const openEdit    = (o) => { setEditingOrder(o);    setModalOpen(true); };
+  const closeModal  = ()  => { setModalOpen(false); setEditingOrder(null); };
+  const openDetail  = (o) => setDetailOrder(o);
+  const closeDetail = ()  => setDetailOrder(null);
 
-  const saveProduct = async (formData) => {
+  const saveOrder = async (formData) => {
     try {
       const isEditing = !!formData.id;
       const originalOrder = dataTest.find(o => (o._id || o.id) === formData.id);
@@ -103,34 +106,39 @@ const useProducts = () => {
   const deleteOrder = async (orderId) => {
     if (!window.confirm("¿Deseas eliminar este pedido?")) return;
     try {
-      const response = await fetch(`${API_URL}/${productId}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("No se pudo eliminar el producto");
-      showToast("Producto eliminado");
+      const response = await fetch(`${API_URL}/${orderId}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("No se pudo eliminar el pedido");
+      showToast("Pedido eliminado");
       await fetchDataTest();
     } catch (e) {
       setError(e.message || "Error al eliminar");
     }
   };
 
-  // ── Derivados ──────────────────────────────────────────
+  const stats = useMemo(() => {
+    const list = Array.isArray(dataTest) ? dataTest : [];
+    return {
+      delivered: list.filter((o) => o.order_status === true).length,
+      pending:   list.filter((o) => o.order_status === false).length,
+      total:     list.length,
+      revenue:   list.reduce((acc, o) => acc + Number(o.total_amount ?? 0), 0),
+    };
+  }, [dataTest]);
+
   const filtered = useMemo(() => {
     const list = Array.isArray(dataTest) ? dataTest : [];
     return list
-      .filter((p) => {
-        if (filter === "all") return true;
-        const cat = (p.category ?? "").toLowerCase();
-        if (filter === "calzado")    return cat === "zapatos" || cat === "calzado";
-        if (filter === "prendas")    return cat === "ropa"    || cat === "prendas";
-        if (filter === "accesorios") return cat === "accesorios";
+      .filter((o) => {
+        if (filter === "delivered") return o.order_status === true;
+        if (filter === "pending")   return o.order_status === false;
         return true;
       })
-      .filter((p) => {
+      .filter((o) => {
         if (!search.trim()) return true;
         const q = search.toLowerCase();
         return (
-          p.name?.toLowerCase().includes(q) ||
-          p.brand?.toLowerCase().includes(q) ||
-          p.description?.toLowerCase().includes(q)
+          o.tracking_number?.toLowerCase().includes(q) ||
+          o.delivery_address?.toLowerCase().includes(q)
         );
       })
       .map((o) => {
@@ -184,43 +192,25 @@ const useProducts = () => {
 
   return {
     filtered,
+    stats,
     filter,    setFilter,
     search,    setSearch,
     loading,
     error,
     modalOpen,
-    editingProduct,
+    editingOrder,
+    detailOrder,
     toast,
     openCreate,
     openEdit,
     closeModal,
-    saveProduct,
-    deleteProduct,
+    openDetail,
+    closeDetail,
+    saveOrder,
+    toggleDelivered,
+    deleteOrder,
     fetchDataTest,
   };
 };
 
-// ── Helpers de mapeo ──────────────────────────────────────
-const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
-
-const genderToEnum = (g) => {
-  const map = {
-    'Hombre': 'hombres', 'hombre': 'hombres',
-    'Mujer':  'mujeres', 'mujer':  'mujeres',
-    'Niño':   'ninos',   'niño':   'ninos',
-    'Niña':   'ninas',   'niña':   'ninas',
-    'Unisex': 'unisex',  'unisex': 'unisex',
-  };
-  return map[g] ?? 'unisex';
-};
-
-const categoryToEnum = (c) => {
-  const map = {
-    'calzado': 'zapatos', 'zapatos': 'zapatos',
-    'ropa': 'ropa', 'prendas': 'ropa',
-    'accesorios': 'ropa',
-  };
-  return map[c?.toLowerCase()] ?? 'ropa';
-};
-
-export default useProducts;
+export default useOrders;
