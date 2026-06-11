@@ -170,7 +170,11 @@ const useProducts = () => {
           client:    o.shopping_cart_id?.customer_id?.name || o.client_name || "Cliente",
           payment:   o.payment_method,
           total:     Number(o.total_amount ?? 0),
-          orderedAt: o.ordered_at?.split("T")[0],
+          orderedAt: o.ordered_at
+            ? (typeof o.ordered_at.split === "function"
+                ? o.ordered_at.split("T")[0]
+                : new Date(o.ordered_at).toISOString().split("T")[0])
+            : "",
           address:   o.delivery_address,
           delivered: o.order_status === true,
           products:  productDetails,
