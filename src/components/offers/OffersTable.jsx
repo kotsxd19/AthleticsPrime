@@ -1,36 +1,51 @@
 // src/components/offers/OffersTable.jsx
+// MODIFICACIÓN: se agrega columna "Miniatura" y botón "Ver detalle" (ojo) en Acciones.
+// Solo esos dos cambios — el resto del diseño original queda intacto.
 
 const fmtDate = (d) => {
-  if (!d) return '\u2014';
+  if (!d) return '—';
   const [y, m, da] = d.split('-');
   return `${da}/${m}/${y}`;
 };
 
-export default function OffersTable({ offers, onToggle, onEdit, onDelete }) {
+export default function OffersTable({ offers, onToggle, onEdit, onDelete, onDetail }) {
   return (
     <section className="bg-white rounded-2xl shadow-sm shadow-slate-200/60 border border-slate-100 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
             <tr className="text-left">
-              {['Título','Descripción','Inicio','Fin','Descuento','Productos','Estado','Acciones'].map(h => {
+              {/* ── NUEVO: columna Miniatura antes de Título ── */}
+              {['Miniatura', 'Título', 'Descripción', 'Inicio', 'Fin', 'Descuento', 'Productos', 'Estado', 'Acciones'].map(h => {
                 const thClass = 'px-5 py-3 font-semibold' + (h === 'Acciones' ? ' text-right' : '');
                 return <th key={h} className={thClass}>{h}</th>;
               })}
             </tr>
           </thead>
+
           <tbody className="divide-y divide-slate-100">
             {offers.map(o => (
               <tr key={o.id} className="product-row">
 
-                {/* Título + código */}
+                {/* ── NUEVO: miniatura del banner ── */}
+                <td className="px-5 py-3">
+                  <div className="w-12 h-12 rounded-lg border border-slate-200/60 bg-white overflow-hidden flex items-center justify-center flex-shrink-0">
+                    {o.bannerUrl ? (
+                      <img src={o.bannerUrl} alt={o.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <i className="fa-regular fa-image text-slate-300 text-lg" />
+                    )}
+                  </div>
+                </td>
+
+                {/* Título */}
                 <td className="px-5 py-4">
                   <div className="font-semibold text-slate-900">{o.title}</div>
                 </td>
 
                 {/* Descripción + tipo */}
                 <td className="px-5 py-4 text-slate-600 max-w-[220px]">
-                  <div className="truncate" title={o.desc}>{o.desc || '\u2014'}</div>
+                  <div className="truncate" title={o.desc}>{o.desc || '—'}</div>
                   <div className="text-[11px] text-slate-400 mt-0.5">{o.type}</div>
                 </td>
 
@@ -43,9 +58,10 @@ export default function OffersTable({ offers, onToggle, onEdit, onDelete }) {
                 {/* Productos tags */}
                 <td className="px-5 py-4">
                   <div className="flex flex-wrap gap-1 max-w-[180px]">
-                    {(o.products || []).slice(0, 2).map(p => (
-                      <span key={p} className="prod-tag">{p}</span>
-                    ))}
+                    {(o.products || []).slice(0, 2).map((p, i) => {
+                      const label = typeof p === 'string' ? p : (p?.name || p?._id || '—');
+                      return <span key={label + i} className="prod-tag">{label}</span>;
+                    })}
                     {(o.products || []).length > 2 && (
                       <span className="prod-tag">+{o.products.length - 2}</span>
                     )}
@@ -63,6 +79,16 @@ export default function OffersTable({ offers, onToggle, onEdit, onDelete }) {
                 {/* Acciones */}
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-end gap-1">
+
+                    {/* ── NUEVO: botón ojo — abre el modal de detalle ── */}
+                    <button
+                      title="Ver detalle"
+                      onClick={() => onDetail(o)}
+                      className="icon-btn text-slate-600 hover:bg-slate-50"
+                    >
+                      <i className="fa-solid fa-eye text-sm" />
+                    </button>
+
                     <button
                       title={o.active ? 'Desactivar' : 'Activar'}
                       onClick={() => onToggle(o.id)}
