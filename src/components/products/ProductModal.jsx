@@ -376,14 +376,45 @@ export default function ProductModal({ product, onClose, onSave }) {
                       />
                     </div>
                     <div>
-                      <label className="input-label">URL de Imagen de variante</label>
-                      <input
-                        type="url"
-                        className="input bg-white text-xs"
-                        placeholder="https://images.cloudinary.com/..."
-                        value={v.images?.[0]?.url || ""}
-                        onChange={(e) => updateVariantImageUrl(vIdx, e.target.value)}
-                      />
+                      <label className="input-label">Imagen de la variante</label>
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-14 rounded-xl border border-slate-200 bg-white overflow-hidden flex items-center justify-center relative flex-shrink-0">
+                          {v.previewUrl || v.images?.[0]?.url ? (
+                            <img
+                              src={v.previewUrl || v.images?.[0]?.url}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <i className="fa-regular fa-image text-slate-400 text-xl" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <label className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl cursor-pointer inline-flex items-center gap-1.5 transition">
+                            <i className="fa-solid fa-cloud-arrow-up text-slate-400" />
+                            Seleccionar imagen
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const preview = URL.createObjectURL(file);
+                                  const updated = [...variants];
+                                  updated[vIdx] = {
+                                    ...updated[vIdx],
+                                    tempFile: file,
+                                    previewUrl: preview,
+                                  };
+                                  setVariants(updated);
+                                }
+                              }}
+                            />
+                          </label>
+                          <p className="text-[10px] text-slate-400 mt-1">PNG, JPG, WEBP de hasta 5MB</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

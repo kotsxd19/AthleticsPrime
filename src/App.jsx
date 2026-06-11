@@ -10,6 +10,7 @@ import Employees  from './pages/Employees';
 import Orders    from './pages/Orders';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import Customers from './pages/Customers';
+import News from './pages/News';
 
 /*
   Páginas futuras — descomenta cuando estén listas:
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/offers"   element={<Offers />}    />
           <Route path="/products" element={<Products />}  />
+          <Route path="/news"     element={<News />}      />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/orders"    element={<Orders />}    />
           <Route path="/customers" element={<Customers />}    />

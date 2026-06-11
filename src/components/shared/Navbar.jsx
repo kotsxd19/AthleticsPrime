@@ -8,6 +8,7 @@ const navLinks = [
   { label: 'Inicio',      to: '/dashboard' },
   { label: 'Ofertas',     to: '/offers'    },
   { label: 'Productos',   to: '/products'  },
+  { label: 'Novedades',   to: '/news'      },
   { label: 'Proveedores', to: '/suppliers' },
   { label: 'Empleados',   to: '/employees' },
   { label: 'Clientes',    to: '/customers' },

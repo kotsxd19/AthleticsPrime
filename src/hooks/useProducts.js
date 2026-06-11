@@ -69,6 +69,36 @@ export function useProducts() {
     try {
       const isEditing = !!formData.id;
 
+      // 1. Subir archivos locales de imágenes si existen
+      const updatedVariants = [...(formData.variants || [])];
+      for (let i = 0; i < updatedVariants.length; i++) {
+        const variant = updatedVariants[i];
+        if (variant.tempFile) {
+          const uploadData = new FormData();
+          uploadData.append("image", variant.tempFile);
+
+          const uploadRes = await fetch("http://localhost:4000/api/products/upload-image", {
+            method: "POST",
+            body: uploadData,
+          });
+
+          if (!uploadRes.ok) {
+            throw new Error(`Error al subir la imagen para la variante de color: ${variant.color}`);
+          }
+
+          const uploadResult = await uploadRes.json();
+          variant.images = [
+            {
+              url: uploadResult.url,
+              public_id: uploadResult.public_id,
+            },
+          ];
+
+          delete variant.tempFile;
+          delete variant.previewUrl;
+        }
+      }
+
       // Format payload to match the Mongoose schema enums and expectations
       const payload = {
         name: formData.name.trim(),
@@ -84,7 +114,7 @@ export function useProducts() {
         featured: formData.featured ? "true" : "false",
         active: formData.active ? "true" : "false",
         // Backend parses variants from JSON string
-        variants: JSON.stringify(formData.variants || []),
+        variants: JSON.stringify(updatedVariants),
       };
 
       const response = await fetch(
