@@ -1,29 +1,55 @@
 // src/components/auth/LoginCard.jsx
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import useLogin from '../../hooks/useLogin';
 
 export default function LoginCard() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!email.trim() || !password.trim()) {
-            setError('Por favor completa todos los campos.');
-            return;
-        }
-        setError('');
-        navigate('/dashboard');
-    };
+    const {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        role,
+        setRole,
+        loading,
+        error,
+        handleSubmit,
+    } = useLogin();
 
     return (
         <div className="login-card">
+            {/* Logo */}
+            <div className="login-logo">
+                PA
+            </div>
 
-            <h1 className="text-center text-[22px] text-[#1a1a1a] mb-7 font-bold">
-                Iniciar sesión
+            <h1 className="text-center text-[22px] text-[#1a1a1a] mb-5 font-bold">
+                Prime Athletics
             </h1>
+
+            {/* Selector de Rol en Pestañas */}
+            <div className="flex border-b border-slate-100 mb-6">
+                <button
+                    type="button"
+                    onClick={() => setRole('employee')}
+                    className={`flex-1 pb-3 text-sm font-semibold transition-all duration-200 border-b-2 cursor-pointer ${
+                        role === 'employee'
+                            ? 'border-indigo-600 text-indigo-600'
+                            : 'border-transparent text-slate-400 hover:text-slate-600'
+                    }`}
+                >
+                    <i className="fa-solid fa-user-tie mr-2"></i>Empleado
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setRole('admin')}
+                    className={`flex-1 pb-3 text-sm font-semibold transition-all duration-200 border-b-2 cursor-pointer ${
+                        role === 'admin'
+                            ? 'border-indigo-600 text-indigo-600'
+                            : 'border-transparent text-slate-400 hover:text-slate-600'
+                    }`}
+                >
+                    <i className="fa-solid fa-user-shield mr-2"></i>Administrador
+                </button>
+            </div>
 
             <form onSubmit={handleSubmit} noValidate>
 
@@ -40,6 +66,7 @@ export default function LoginCard() {
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         required
+                        disabled={loading}
                     />
                 </div>
 
@@ -56,12 +83,16 @@ export default function LoginCard() {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         required
+                        disabled={loading}
                     />
                 </div>
 
                 {/* Error */}
                 {error && (
-                    <p className="text-rose-500 text-xs mb-3">{error}</p>
+                    <div className="flex items-center gap-2 text-rose-500 text-xs mb-3 bg-rose-50 border border-rose-100 p-2.5 rounded-lg">
+                        <i className="fa-solid fa-circle-exclamation text-rose-400"></i>
+                        <span>{error}</span>
+                    </div>
                 )}
 
                 {/* Olvidé contraseña */}
@@ -70,8 +101,19 @@ export default function LoginCard() {
                 </a>
 
                 {/* Botón */}
-                <button type="submit" className="login-btn">
-                    Aceptar
+                <button 
+                    type="submit" 
+                    className={`login-btn flex items-center justify-center gap-2 cursor-pointer ${loading ? 'opacity-75 cursor-wait' : ''}`}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>Iniciando sesión...</span>
+                        </>
+                    ) : (
+                        <span>Ingresar</span>
+                    )}
                 </button>
 
             </form>

@@ -1,14 +1,14 @@
-// src/pages/Customers.jsx
+// src/pages/Employees.jsx
 import React from 'react';
-import useCustomer from '../hooks/useCustomer';
+import useEmployees from '../hooks/useEmployees';
 import PageHeader from '../components/shared/PageHeader';
 import Toast from '../components/shared/Toast';
-import CustomersStats from '../components/customers/CustomersStats';
-import CustomersFilters from '../components/customers/CustomersFilters';
-import CustomersTable from '../components/customers/CustomersTable';
-import CustomersModal from '../components/customers/CustomersModal';
+import EmployeesStats from '../components/employees/EmployeesStats';
+import EmployeesFilters from '../components/employees/EmployeesFilters';
+import EmployeesTable from '../components/employees/EmployeesTable';
+import EmployeeModal from '../components/employees/EmployeeModal';
 
-export default function Customers() {
+export default function Employees() {
   const {
     filtered,
     stats,
@@ -30,6 +30,10 @@ export default function Customers() {
     setStatus,
     phone_number,
     setPhoneNumber,
+    position,
+    setPosition,
+    hire_date,
+    setHireDate,
     is_verified,
     setIsVerified,
     address,
@@ -38,43 +42,53 @@ export default function Customers() {
     openCreate,
     openEdit,
     closeModal,
-    saveClient,
-    toggleClient,
+    saveEmployee,
+    toggleEmployee,
     toggleVerified,
-    deleteClient,
+    deleteEmployee,
     submitting,
-  } = useCustomer();
+  } = useEmployees();
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <PageHeader
-          title="Clientes"
-          subtitle="Gestiona tus clientes, estados y verificaciones"
+          title="Empleados"
+          subtitle="Gestiona el personal interno, cargos y estados de activación"
         />
-        <CustomersStats stats={stats} />
+        <EmployeesStats stats={stats} />
       </div>
 
-      <CustomersFilters
+      <EmployeesFilters
         filter={filter}
         setFilter={setFilter}
         search={search}
         setSearch={setSearch}
       />
 
-      <CustomersTable
-        clients={filtered}
+      <EmployeesTable
+        employees={filtered}
         loading={loading}
         error={error}
-        onToggle={toggleClient}
-        onToggleVerified={toggleVerified}
         onEdit={openEdit}
-        onDelete={deleteClient}
+        onDelete={deleteEmployee}
+        onToggle={toggleEmployee}
+        onToggleVerified={toggleVerified}
       />
 
+      {/* FAB to add new employee */}
+      <button
+        onClick={openCreate}
+        className="fab fixed bottom-8 right-8 bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-2xl z-30 cursor-pointer"
+        aria-label="Agregar empleado"
+      >
+        <i className="fa-solid fa-plus" />
+      </button>
+
+      {/* Form Modal */}
       {modalOpen && (
-        <CustomersModal
+        <EmployeeModal
           id={id}
           name={name}
           setName={setName}
@@ -84,27 +98,22 @@ export default function Customers() {
           setPassword={setPassword}
           phone_number={phone_number}
           setPhoneNumber={setPhoneNumber}
+          position={position}
+          setPosition={setPosition}
+          hire_date={hire_date}
+          setHireDate={setHireDate}
           address={address}
           setAddress={setAddress}
           status={status}
           setStatus={setStatus}
           is_verified={is_verified}
           setIsVerified={setIsVerified}
-          onSubmit={saveClient}
+          onSubmit={saveEmployee}
           onClose={closeModal}
           submitting={submitting}
           error={error}
         />
       )}
-
-      {/* FAB to add new customer */}
-      <button
-        onClick={openCreate}
-        className="fab fixed bottom-8 right-8 bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-2xl z-30 cursor-pointer"
-        aria-label="Agregar cliente"
-      >
-        <i className="fa-solid fa-plus" />
-      </button>
 
       <Toast message={toast} />
 

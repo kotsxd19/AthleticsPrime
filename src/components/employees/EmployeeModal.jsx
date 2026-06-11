@@ -1,7 +1,7 @@
-// src/components/customers/CustomersModal.jsx
+// src/components/employees/EmployeeModal.jsx
 import React from 'react';
 
-export default function CustomersModal({
+export default function EmployeeModal({
   id,
   name,
   setName,
@@ -11,6 +11,10 @@ export default function CustomersModal({
   setPassword,
   phone_number,
   setPhoneNumber,
+  position,
+  setPosition,
+  hire_date,
+  setHireDate,
   address,
   setAddress,
   status,
@@ -33,9 +37,9 @@ export default function CustomersModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
           <div>
             <h3 className="text-base font-bold tracking-tight text-slate-800">
-              {id ? 'Editar Cliente' : 'Nuevo Cliente'}
+              {id ? 'Editar Empleado' : 'Nuevo Empleado'}
             </h3>
-            <p className="text-xs text-slate-400">Completa los datos de la cuenta del cliente</p>
+            <p className="text-xs text-slate-400">Completa los datos del personal interno</p>
           </div>
           <button
             type="button"
@@ -64,7 +68,7 @@ export default function CustomersModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="input"
-                placeholder="Nombre del cliente"
+                placeholder="Nombre del empleado"
                 required
                 disabled={submitting}
               />
@@ -78,7 +82,7 @@ export default function CustomersModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input"
-                placeholder="correo@cliente.com"
+                placeholder="correo@empresa.com"
                 required
                 disabled={submitting}
               />
@@ -100,15 +104,41 @@ export default function CustomersModal({
               />
             </div>
 
-            {/* Teléfono */}
+            {/* Teléfono y Cargo */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="input-label">Teléfono</label>
+                <input
+                  type="text"
+                  value={phone_number}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="input"
+                  placeholder="+503 7777-7777"
+                  disabled={submitting}
+                />
+              </div>
+              <div>
+                <label className="input-label">Cargo</label>
+                <input
+                  type="text"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="input"
+                  placeholder="Ej. Gerente, Vendedor"
+                  required
+                  disabled={submitting}
+                />
+              </div>
+            </div>
+
+            {/* Fecha Contratación */}
             <div>
-              <label className="input-label">Teléfono</label>
+              <label className="input-label">Fecha de Contratación</label>
               <input
-                type="text"
-                value={phone_number}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                type="date"
+                value={hire_date}
+                onChange={(e) => setHireDate(e.target.value)}
                 className="input"
-                placeholder="+503 7777-7777"
                 disabled={submitting}
               />
             </div>
@@ -121,7 +151,7 @@ export default function CustomersModal({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 className="input"
-                placeholder="Dirección residencial del cliente"
+                placeholder="Dirección residencial"
                 disabled={submitting}
               />
             </div>
@@ -132,17 +162,17 @@ export default function CustomersModal({
                 <input
                   type="checkbox"
                   className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                  checked={!!status}
+                  checked={status}
                   onChange={(e) => setStatus(e.target.checked)}
                   disabled={submitting}
                 />
-                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Cliente Activo</span>
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Empleado Activo</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                  checked={!!is_verified}
+                  checked={is_verified}
                   onChange={(e) => setIsVerified(e.target.checked)}
                   disabled={submitting}
                 />
@@ -165,7 +195,7 @@ export default function CustomersModal({
                 disabled={submitting}
                 className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 cursor-pointer"
               >
-                {submitting ? 'Guardando...' : id ? 'Actualizar' : 'Guardar Cliente'}
+                {submitting ? 'Guardando...' : id ? 'Actualizar' : 'Guardar Empleado'}
               </button>
             </div>
           </form>

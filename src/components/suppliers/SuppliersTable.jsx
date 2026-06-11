@@ -1,53 +1,120 @@
 // src/components/suppliers/SuppliersTable.jsx
+import React from "react";
 
 const fmtDate = (d) => {
-  if (!d) return '—';
-  const [y, m, da] = d.split('-');
+  if (!d) return "—";
+  const [y, m, da] = d.split("-");
   return `${da}/${m}/${y}`;
 };
 
-export default function SuppliersTable({ suppliers, onToggle, onEdit, onDelete }) {
+const HEADERS = [
+  "Nombre",
+  "Nombre contacto",
+  "N. Teléfono",
+  "Correo",
+  "Ubicación",
+  "Estado",
+  "F. Creado",
+  "F. Act.",
+  "Acciones",
+];
+
+export default function SuppliersTable({ suppliers, onToggle, onEdit, onDetail }) {
+  const rows = suppliers || [];
+
   return (
     <section className="bg-white rounded-2xl shadow-sm shadow-slate-200/60 border border-slate-100 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
             <tr className="text-left">
-              {['Nombre','Nombre contacto','N. Teléfono','Correo','Ubicación','Estado','F. Creado','F. Act.','Acciones'].map(h => (
-                <th key={h} className={`px-5 py-3 font-semibold${h === 'Acciones' ? ' text-right' : ''}`}>{h}</th>
+              {HEADERS.map((h) => (
+                <th
+                  key={h}
+                  className={`px-5 py-3.5 font-semibold ${
+                    h === "Acciones" ? "text-right pr-6" : ""
+                  }`}
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {suppliers.map(s => (
-              <tr key={s.id} className="product-row">
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={HEADERS.length} className="px-5 py-8 text-center text-slate-400 bg-slate-50/50">
+                  <div className="flex flex-col items-center gap-2">
+                    <i className="fa-solid fa-folder-open text-2xl text-slate-300" />
+                    <span>No se encontraron proveedores registrados.</span>
+                  </div>
+                </td>
+              </tr>
+            ) : null}
+
+            {rows.map((s) => (
+              <tr key={s.id} className="product-row hover:bg-slate-50/50 transition-colors">
+                {/* Nombre */}
                 <td className="px-5 py-4 font-semibold text-slate-900">{s.name}</td>
-                <td className="px-5 py-4 text-slate-600">{s.contact}</td>
-                <td className="px-5 py-4 text-slate-600">{s.phone || '—'}</td>
+                {/* Contacto */}
+                <td className="px-5 py-4 text-slate-600 font-medium">{s.contact}</td>
+                {/* Teléfono */}
+                <td className="px-5 py-4 text-slate-600">{s.phone || "—"}</td>
+                {/* Correo */}
                 <td className="px-5 py-4 text-slate-500 max-w-[200px]">
-                  <div className="truncate" title={s.email}>{s.email || '—'}</div>
+                  <div className="truncate" title={s.email}>
+                    {s.email || "—"}
+                  </div>
                 </td>
+                {/* Ubicación */}
                 <td className="px-5 py-4 text-slate-600 max-w-[160px]">
-                  <div className="truncate" title={s.location}>{s.location || '—'}</div>
+                  <div className="truncate" title={s.location}>
+                    {s.location || "—"}
+                  </div>
                 </td>
+                {/* Estado clickeable */}
                 <td className="px-5 py-4">
-                  <span className={`status-badge ${s.active ? 'status-active' : 'status-inactive'}`}>
-                    <i className="fa-solid fa-circle text-[7px]" />
-                    {s.active ? 'Activo' : 'Inactivo'}
-                  </span>
+                  <button
+                    onClick={() => onToggle && onToggle(s.id)}
+                    title={s.active ? "Haz clic para desactivar" : "Haz clic para activar"}
+                    className="cursor-pointer hover:opacity-85 active:scale-95 transition-all focus:outline-none"
+                  >
+                    <span className={`status-badge ${s.active ? "status-active" : "status-inactive"}`}>
+                      <i className="fa-solid fa-circle text-[7px]" />
+                      {s.active ? "Activo" : "Inactivo"}
+                    </span>
+                  </button>
                 </td>
-                <td className="px-5 py-4 text-slate-600">{fmtDate(s.createdAt)}</td>
-                <td className="px-5 py-4 text-slate-600">{fmtDate(s.updatedAt)}</td>
-                <td className="px-5 py-4">
+                {/* Fechas */}
+                <td className="px-5 py-4 text-slate-500">{fmtDate(s.createdAt)}</td>
+                <td className="px-5 py-4 text-slate-500">{fmtDate(s.updatedAt)}</td>
+                {/* Acciones */}
+                <td className="px-5 py-4 text-right pr-6">
                   <div className="flex items-center justify-end gap-1">
-                    <button title={s.active ? 'Desactivar' : 'Activar'} onClick={() => onToggle(s.id)} className="icon-btn text-slate-600">
-                      <i className={`fa-solid fa-${s.active ? 'pause' : 'play'}`} />
+                    <button
+                      title="Ver detalles"
+                      onClick={() => onDetail && onDetail(s)}
+                      className="icon-btn text-blue-600 hover:bg-blue-50 cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center transition"
+                    >
+                      <i className="fa-solid fa-eye text-sm" />
                     </button>
-                    <button title="Editar" onClick={() => onEdit(s)} className="icon-btn text-indigo-600 hover:bg-indigo-50">
-                      <i className="fa-solid fa-pen" />
+                    <button
+                      title="Editar"
+                      onClick={() => onEdit && onEdit(s)}
+                      className="icon-btn text-indigo-600 hover:bg-indigo-50 cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center transition"
+                    >
+                      <i className="fa-solid fa-pen text-sm" />
                     </button>
-                    <button title="Eliminar" onClick={() => onDelete(s.id)} className="icon-btn text-rose-600 hover:bg-rose-50">
-                      <i className="fa-solid fa-trash" />
+                    <button
+                      title={s.active ? "Desactivar" : "Activar"}
+                      onClick={() => onToggle && onToggle(s.id)}
+                      className={`icon-btn w-8 h-8 rounded-lg flex items-center justify-center transition cursor-pointer ${
+                        s.active
+                          ? "text-amber-600 hover:bg-amber-50"
+                          : "text-emerald-600 hover:bg-emerald-50"
+                      }`}
+                    >
+                      <i className={`fa-solid fa-${s.active ? "pause" : "play"} text-sm`} />
                     </button>
                   </div>
                 </td>
@@ -56,12 +123,6 @@ export default function SuppliersTable({ suppliers, onToggle, onEdit, onDelete }
           </tbody>
         </table>
       </div>
-      {suppliers.length === 0 && (
-        <div className="p-12 text-center text-slate-500">
-          <i className="fa-regular fa-folder-open text-3xl mb-3 text-slate-300 block" />
-          <p>No hay proveedores que coincidan.</p>
-        </div>
-      )}
     </section>
   );
 }

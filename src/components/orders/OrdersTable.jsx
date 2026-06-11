@@ -13,7 +13,7 @@ export default function OrdersTable({ orders, onToggleDelivered, onDetail, onEdi
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
             <tr className="text-left">
-              {['ID','Productos','Cliente','Pago','Monto final','F. Pedido','Dirección de envío','Entregado','Acciones'].map(h => (
+              {['ID','Productos','Pago','Monto final','F. Pedido','Dirección de envío','Entregado','Acciones'].map(h => (
                 <th key={h} className={`px-5 py-3 font-semibold${h === 'Acciones' ? ' text-right' : ''}`}>{h}</th>
               ))}
             </tr>
@@ -30,7 +30,6 @@ export default function OrdersTable({ orders, onToggleDelivered, onDetail, onEdi
                     Detalles
                   </button>
                 </td>
-                <td className="px-5 py-4 text-slate-700">{o.client}</td>
                 <td className="px-5 py-4">
                   <span className={`text-sm font-medium ${o.payment === 'Tarjeta' ? 'text-indigo-600' : 'text-emerald-600'}`}>
                     {o.payment}

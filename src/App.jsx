@@ -6,8 +6,10 @@ import Offers     from './pages/Offers';
 import Products   from './pages/Products';
 import Login      from './pages/Login';
 import Suppliers  from './pages/supplier';
-import Clients   from './pages/Customers';
+import Employees  from './pages/Employees';
 import Orders    from './pages/Orders';
+import ProtectedRoute from './components/shared/ProtectedRoute';
+import Customers from './pages/Customers';
 
 /*
   Páginas futuras — descomenta cuando estén listas:
@@ -30,15 +32,21 @@ export default function App() {
       <Routes>
         <Route path="/"         element={<Navigate to="/login" replace />} />
         <Route path="/login"    element={<Login />}     />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/offers"   element={<Offers />}    />
-        <Route path="/products" element={<Products />}  />
-        <Route path="/suppliers" element={<Suppliers />} />
-        <Route path="/clients"   element={<Clients />}   /> 
-        <Route path="/orders"    element={<Orders />}    />
 
-        {/* Futuras rutas */}
-        {/*  */}
+        {/* Rutas de personal (administradores y empleados) */}
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'employee']} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/offers"   element={<Offers />}    />
+          <Route path="/products" element={<Products />}  />
+          <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/orders"    element={<Orders />}    />
+          <Route path="/customers" element={<Customers />}    />
+        </Route>
+
+        {/* Rutas exclusivas de administradores */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/employees"   element={<Employees />}   /> 
+        </Route>
 
         {/* Ruta desconocida → login */}
         <Route path="*" element={<Navigate to="/login" replace />} />

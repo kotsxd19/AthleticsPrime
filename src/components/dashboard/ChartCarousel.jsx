@@ -1,23 +1,28 @@
-// src/components/ChartCarousel.jsx
+// src/components/dashboard/ChartCarousel.jsx
 import { useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
 import { useCarousel } from '../../hooks/useCarousel';
-import { chartTitles } from '../../data/metrics';
-
-const rand = (min, max) => Math.round(min + Math.random() * (max - min));
-const series = (n, min, max) => Array.from({ length: n }, () => rand(min, max));
 
 const baseScales = {
     x: { grid: { display: false }, ticks: { color: 'rgba(226,232,240,0.6)', font: { size: 10 } } },
     y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(226,232,240,0.6)', font: { size: 10 } } },
 };
 
-export default function ChartCarousel() {
-    const { idx, next, prev, jumpTo } = useCarousel(4, 4000);
+const chartTitles = [
+    'Ventas mensuales',
+    'Ingresos por categoría',
+    'Actividad semanal',
+    'Estado de pedidos'
+];
+
+export default function ChartCarousel({ charts: chartsData }) {
+    const { idx, next, prev, jumpTo } = useCarousel(4, 5000);
     const refs = [useRef(), useRef(), useRef(), useRef()];
     const charts = useRef([]);
 
     useEffect(() => {
+        if (!chartsData) return;
+
         Chart.defaults.color = 'rgba(226,232,240,0.75)';
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
@@ -33,9 +38,9 @@ export default function ChartCarousel() {
             {
                 el: refs[0].current, type: 'line',
                 data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'],
+                    labels: chartsData.ventasMensuales?.labels || [],
                     datasets: [{
-                        label: 'Ventas', data: series(8, 1200, 4800),
+                        label: 'Ventas', data: chartsData.ventasMensuales?.data || [],
                         borderColor: '#a5b4fc', fill: true, tension: 0.4,
                         pointBackgroundColor: '#fff', pointRadius: 3, borderWidth: 2.5
                     }]
@@ -46,9 +51,9 @@ export default function ChartCarousel() {
             {
                 el: refs[1].current, type: 'bar',
                 data: {
-                    labels: ['Ropa', 'Calzado', 'Accesorios', 'Deporte', 'Outlet'],
+                    labels: chartsData.ingresosCategoria?.labels || [],
                     datasets: [{
-                        label: 'Ingresos', data: series(5, 800, 5000),
+                        label: 'Ingresos', data: chartsData.ingresosCategoria?.data || [],
                         borderRadius: 8, borderSkipped: false, maxBarThickness: 36
                     }]
                 },
@@ -58,9 +63,9 @@ export default function ChartCarousel() {
             {
                 el: refs[2].current, type: 'line',
                 data: {
-                    labels: ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
+                    labels: chartsData.usuariosSemanales?.labels || [],
                     datasets: [{
-                        label: 'Usuarios activos', data: series(7, 400, 1800),
+                        label: 'Usuarios activos', data: chartsData.usuariosSemanales?.data || [],
                         borderColor: '#fbbf24', fill: true, tension: 0.45,
                         pointBackgroundColor: '#fff', pointRadius: 3, borderWidth: 2.5
                     }]
@@ -71,10 +76,10 @@ export default function ChartCarousel() {
             {
                 el: refs[3].current, type: 'bar',
                 data: {
-                    labels: ['Por pagar', 'En preparación', 'Enviado', 'En reparto', 'Devolución'],
+                    labels: chartsData.pedidosStatus?.labels || [],
                     datasets: [{
-                        label: 'Pedidos', data: series(5, 5, 80),
-                        backgroundColor: ['#f87171', '#fbbf24', '#60a5fa', '#a78bfa', '#f472b6'],
+                        label: 'Pedidos', data: chartsData.pedidosStatus?.data || [],
+                        backgroundColor: ['#f87171', '#fbbf24', '#34d399'], // Pendiente (red), Proceso (yellow), Finalizado (green)
                         borderRadius: 8, borderSkipped: false, maxBarThickness: 22
                     }]
                 },
@@ -88,7 +93,11 @@ export default function ChartCarousel() {
             },
         ];
 
+        // Clean up previous charts to rebuild
+        charts.current.forEach(c => c && typeof c.destroy === 'function' && c.destroy());
+
         charts.current = configs.map(({ el, type, data, extra, options }) => {
+            if (!el) return null;
             const ctx = el.getContext('2d');
             if (extra) data.datasets[0] = { ...data.datasets[0], ...extra(ctx) };
             return new Chart(ctx, {
@@ -101,22 +110,23 @@ export default function ChartCarousel() {
                     ...options,
                 },
             });
-        });
-
-        // Refresco de datos cada 6 s
-        const refresh = setInterval(() => {
-            charts.current[0].data.datasets[0].data = series(8, 1200, 4800);
-            charts.current[1].data.datasets[0].data = series(5, 800, 5000);
-            charts.current[2].data.datasets[0].data = series(7, 400, 1800);
-            charts.current[3].data.datasets[0].data = series(5, 5, 80);
-            charts.current.forEach(c => c.update());
-        }, 6000);
+        }).filter(Boolean);
 
         return () => {
-            clearInterval(refresh);
-            charts.current.forEach(c => c.destroy());
+            charts.current.forEach(c => c && typeof c.destroy === 'function' && c.destroy());
         };
-    }, []);
+    }, [chartsData]);
+
+    if (!chartsData) {
+        return (
+            <div className="rounded-3xl p-8 bg-slate-900 border border-slate-800 text-center text-slate-400 h-[380px] flex items-center justify-center">
+                <div className="space-y-3">
+                    <i className="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-400" />
+                    <p>Cargando gráficos analíticos...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <section className="rounded-3xl overflow-hidden shadow-xl shadow-slate-200/70">
@@ -131,10 +141,10 @@ export default function ChartCarousel() {
                         </h3>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={prev} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
+                        <button onClick={prev} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center cursor-pointer">
                             <i className="fa-solid fa-chevron-left text-xs" />
                         </button>
-                        <button onClick={next} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
+                        <button onClick={next} className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center cursor-pointer">
                             <i className="fa-solid fa-chevron-right text-xs" />
                         </button>
                     </div>
@@ -161,12 +171,12 @@ export default function ChartCarousel() {
                             <button
                                 key={i}
                                 onClick={() => jumpTo(i)}
-                                className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-8 bg-white' : 'w-2 bg-white/30'
+                                className={`h-1.5 rounded-full transition-all cursor-pointer ${i === idx ? 'w-8 bg-white' : 'w-2 bg-white/30'
                                     }`}
                             />
                         ))}
                     </div>
-                    <span className="text-xs text-slate-400">Auto · 4s</span>
+                    <span className="text-xs text-slate-400">Auto · 5s</span>
                 </div>
             </div>
         </section>
