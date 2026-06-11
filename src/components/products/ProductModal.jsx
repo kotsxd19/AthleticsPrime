@@ -153,6 +153,30 @@ export default function ProductModal({ product, onClose, onSave }) {
     });
   };
 
+  // Datos para modo view
+  const totalStock = product?.variants?.reduce(
+    (acc, v) => acc + (v.sizes?.reduce((a, s) => a + (s.stock ?? 0), 0) ?? 0), 0
+  ) ?? product?.qty ?? 0;
+
+  const allImages = product?.variants?.flatMap(v => v.images ?? []) ?? [];
+  const allSizes  = product?.variants?.flatMap(v =>
+    v.sizes?.map(s => ({ size: s.size, color: v.color, stock: s.stock })) ?? []
+  ) ?? [];
+
+  // Título e ícono del header según modo
+  const headerIcon  = isView ? 'fa-eye text-slate-500'
+                    : isEdit ? 'fa-pen text-indigo-500'
+                    :          'fa-plus text-violet-500';
+  const headerBg    = isView ? 'bg-slate-100'
+                    : isEdit ? 'bg-indigo-50'
+                    :          'bg-violet-50';
+  const headerTitle = isView ? product?.name
+                    : isEdit ? 'Editar producto'
+                    :          'Agregar nuevo producto';
+  const headerSub   = isView ? 'Detalle del producto'
+                    : isEdit ? `Modificando: ${product?.name}`
+                    :          'Completa los detalles del producto';
+
   return (
     <div
       className="fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"

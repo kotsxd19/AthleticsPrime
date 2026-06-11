@@ -29,10 +29,11 @@ export default function OrdersFilters({ filter, setFilter, search, setSearch }) 
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por ID, cliente o dirección…"
-            className="input pl-9"
+            className="input !pl-9"
           />
         </div>
       </div>
     </section>
   );
 }
+

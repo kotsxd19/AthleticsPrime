@@ -8,6 +8,7 @@ import ProductsTable from '../components/products/ProductsTable';
 import ProductModal from '../components/products/ProductModal';
 import ProductDetailModal from '../components/products/ProductDetailModal';
 
+// modal = null | { mode: "view"|"edit"|"create", product?: {} }
 export default function Products() {
   const {
     filtered,
@@ -109,7 +110,6 @@ export default function Products() {
       )}
 
       <Toast message={toast} />
-
     </main>
   );
 }
